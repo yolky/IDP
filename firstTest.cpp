@@ -22,25 +22,52 @@ int main ()
 		if (val == TEST_INSTRUCTION_RESULT) {     // check result
 		cout << "Test passed" << endl;
 		
-		rlink.command (MOTOR_1_GO, 127); //RED = 1
-		rlink.command (MOTOR_2_GO, 127); //GREEN = 2
-		delay(10000);
+		//rlink.command (MOTOR_1_GO, 127); //RED = 1
+		//rlink.command (MOTOR_2_GO, 127); //GREEN = 2
+		//delay(10000);
 		
 		//38.5ms for writing
 		//5ms for reading
 		//2ms reading on robot
 		
 		
-		int value = 255;
-		stopwatch watch;
-		watch.start();
-		for(int i=0; i< 100; i ++){
-			rlink.command(WRITE_PORT_5, value);
-		}
-		int time = watch.read();
-		watch.stop();
+		//int value = 255;
+		//stopwatch watch;
+		//watch.start();
+		//for(int i=0; i< 100; i ++){
+			//rlink.command(WRITE_PORT_5, value);
+		//}
+		//int time = watch.read();
+		//watch.stop();
 		
-		cout<< time<< endl;
+		rlink.command(MOTOR_1_GO, 192);
+		rlink.command(MOTOR_2_GO, 64);
+		delay(10000);
+		
+		rlink.command(MOTOR_1_GO, 64);
+		rlink.command(MOTOR_2_GO, 192);
+		delay(10000);
+		
+		//rlink.command(MOTOR_1_GO, 64);
+		//delay(300);
+		//rlink.command(MOTOR_1_GO, 0);
+		//rlink.command(MOTOR_2_GO, 192);
+		//delay(300);
+		//rlink.command(MOTOR_2_GO, 0);
+		//rlink.command(MOTOR_1_GO, 64);
+		//delay(300);
+		//rlink.command(MOTOR_1_GO, 0);
+		//rlink.command(MOTOR_2_GO, 192);
+		//delay(300);
+		
+		//for(int i =0; i < 10; i++){
+		//rlink.command(MOTOR_2_GO, 0);
+		//rlink.command(MOTOR_1_GO, 64);
+		//delay(300);
+		//rlink.command(MOTOR_1_GO, 0);
+		//rlink.command(MOTOR_2_GO, 192);
+		//delay(300);
+	//}
 		
 		return 0;                             // all OK, finish
 	}

@@ -1,0 +1,17 @@
+[project]
+name=firstTest
+base_path=/homes/nl355/idp_shared/Common/final
+make_in_base_path=true
+description=1B IDP
+run_cmd=./firstTest
+ 
+[files]
+current_page=1
+FILE_NAME_0=0;C++;0;16;1;1;0;firstTest.cpp;0
+ 
+[indentation]
+indent_width=4
+indent_type=1
+indent_hard_tab_width=8
+detect_indent=false
+indent_mode=2
