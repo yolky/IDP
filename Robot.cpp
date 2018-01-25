@@ -9,6 +9,13 @@
 
 Robot::Robot(){
 	initialiseRobotLink();
+	initialiseSensors();
+}
+
+void Robot::initiliseSensors() {
+	leftSpeed = 0;
+	rightSpeed = 0;
+	lineSensors = { false, false, false, false };
 }
 
 void Robot::initialiseRobotLink(){
@@ -24,27 +31,25 @@ void Robot::initialiseRobotLink(){
 
 void Robot::setLeftMotor(double speed){
 	int uIntSpeed = doubleToUInt(-1.0 * speed);
-	cout<< uIntSpeed << endl;
-	rlink.command(MOTOR_1_GO, uIntSpeed);
+	if (uIntSpeed != leftSpeed) {
+		rlink.command(MOTOR_1_GO, uIntSpeed);
+	}
 }
 
 void Robot::setRightMotor(double speed){
 	int uIntSpeed = doubleToUInt(speed);
-		cout<< uIntSpeed << endl;
-
-	rlink.command(MOTOR_2_GO, uIntSpeed);
+	if (uIntSpeed != rightSpeed) {
+		rlink.command(MOTOR_2_GO, uIntSpeed);
+	}
 }
 
 void Robot::setMotors(double leftSpeed, double rightSpeed){
 	setLeftMotor(leftSpeed);
 	setRightMotor(rightSpeed);
-
 }
 
 int Robot::doubleToUInt(double number){
 	int asInt = round(number * 127);
-
-	
 	return (asInt>0)? asInt : (-1 * asInt) + 128;
 }
 
@@ -54,4 +59,21 @@ int Robot::sendTestInstruction(){
 
 void Robot::printErrors(){
 	rlink.print_errs();
+}
+
+void Robot::updateLineSensors() {
+	int sensorValues = rlink.request(READ_PORT_0);
+	for (int i = 0; i < 4 i++) {
+		lineSensors[i] = (bool)sensorValues % 2;
+		sensorValues = sensorValues >> 1;
+	}
+}
+
+bool Robot::checkLineSensorsMatch(int sensorState[]) {
+	for (int i = 0; i < 4; i++) {
+		if (sensorState[i] != -1 && sensorState[i] != lineSensors[i]) {
+			return false;
+		}
+	}
+	return true;
 }

@@ -4,6 +4,7 @@ using namespace std;
 #include <robot_link.h>
 #include <robot_delay.h>
 #include <stopwatch.h>
+#include <functional>
 #include "Robot.h"
 #include "Robot.cpp"
 #include "Instruction.h"
@@ -12,24 +13,32 @@ using namespace std;
 #include "InstructionHandler.cpp"
 
 void bullShit();
-                          // datatype for the robot link
-int main ()
+function<bool()> getLineSensorStopCondition(Robot robot, int sensorState[]);
+function<void()> followLineOperation(Robot robot);
+
+int main()
 {
 	Robot robot;
-	
-	Instruction testInstruction(robot, bullShit);
+
+	const function <bool()> STOP_CONDITION_T_JUNCTION = getLineSensorStopCondition(robot, { 1, 1, 1, 1 });
+	const function <bool()> STOP_CONDITION_RIGHT_45 = getLineSensorStopCondition(robot, { -1, -1, 0, 1 });
+	const function <bool()> STOP_CONDITION_LEFT_45 = getLineSensorStopCondition(robot, { 1, 0, -1, -1 });
+	const function <bool()> STOP_CONDITION_RIGHT_TURN = getLineSensorStopCondition(robot, { -1, -1, 1, 1 });
+	const function <bool()> STOP_CONDITION_LEFT_TURN = getLineSensorStopCondition(robot, { 1, 1, -1, -1 });
+
+
+	Instruction testInstruction(robot, followLineOperation(robot), STOP_CONDITION_T_JUNCTION, 1000, 20000);
 	testInstruction.operation();
 	Instruction instructions [1] = {testInstruction};
 	
-	InstructionHandler instructionHandler;
-	instructionHandler.runInstructions(instructions);
+	function <bool ()> = getLine
 	
 	int val = robot.sendTestInstruction();  // send test instruction
 	if (val == TEST_INSTRUCTION_RESULT) {     // check result
 		cout << "Test passed" << endl;
 		
-		robot.setMotors(.5, .5);
-		delay(5000);
+		InstructionHandler instructionHandler;
+		instructionHandler.runInstructions(instructions);
 
 		return 0;                             // all OK, finish
 	}
@@ -44,4 +53,25 @@ int main ()
 
 void bullShit(){
 	cout<<"something belse" << endl;
+}
+
+function<bool ()> getLineSensorStopCondition(Robot robot, int sensorState[]) {
+	return []() {
+		robot.updateLineSensors();
+		robot.checkLineSensorsMatch(sensorState);
+	};
+}
+
+function<void()> followLineOperation(Robot robot) {
+	return []() {
+		if (robot.checkLineSensorsMatch([-1, 0, 0, -1])) {
+			robot.setMotors(1.0, 1.0);
+		}
+		else if (robot.checkLineSensorsMatch([-1, 1, 0, -1])) {
+			robot.setMotors(1.0, 0.8);
+		}
+		else if (robot.checkLineSensorsMatch([-1, 0, 1, -1])) {
+			robot.setMotors(0.8, 1.0);
+		}
+	}
 }
