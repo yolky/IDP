@@ -6,8 +6,9 @@
 class InstructionHandler{
 	private:
 	public:
+        Robot robot;
 		InstructionHandler();
 		void runInstructions(Instruction instructions[]);
-		void runInstruction(Instruction instruction);
+		void runInstruction(Instruction& instruction);
 };
 #endif

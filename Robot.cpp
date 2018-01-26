@@ -12,13 +12,16 @@ Robot::Robot(){
 	initialiseSensors();
 }
 
-void Robot::initiliseSensors() {
+void Robot::initialiseSensors() {
 	leftSpeed = 0;
 	rightSpeed = 0;
-	lineSensors = { false, false, false, false };
+	for(int i = 0; i< 4; i++){
+        lineSensors[i] = false;
+	}
 }
 
 void Robot::initialiseRobotLink(){
+
 	#ifdef __arm__
 		if (!rlink.initialise ("127.0.0.1")) {          // setup for local hardware
 	#else
@@ -27,6 +30,7 @@ void Robot::initialiseRobotLink(){
 		cout << "Cannot initialise link" << endl;
 		rlink.print_errs("    ");
 	}
+
 }
 
 void Robot::setLeftMotor(double speed){
@@ -63,8 +67,9 @@ void Robot::printErrors(){
 
 void Robot::updateLineSensors() {
 	int sensorValues = rlink.request(READ_PORT_0);
-	for (int i = 0; i < 4 i++) {
-		lineSensors[i] = (bool)sensorValues % 2;
+	cout<< sensorValues<< endl;
+	for (int i = 0; i < 4; i++) {
+		lineSensors[i] = sensorValues % 2;
 		sensorValues = sensorValues >> 1;
 	}
 }

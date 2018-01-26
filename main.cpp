@@ -13,30 +13,38 @@ using namespace std;
 #include "InstructionHandler.cpp"
 
 void bullShit();
-function<bool()> getLineSensorStopCondition(Robot robot, int sensorState[]);
-function<void()> followLineOperation(Robot robot);
+function<bool()> getLineSensorStopCondition(Robot& robot, int sensorState[]);
+function<void()> followLineOperation(Robot& robot);
 
 int main()
 {
 	Robot robot;
 
-	const function <bool()> STOP_CONDITION_T_JUNCTION = getLineSensorStopCondition(robot, { 1, 1, 1, 1 });
-	const function <bool()> STOP_CONDITION_RIGHT_45 = getLineSensorStopCondition(robot, { -1, -1, 0, 1 });
-	const function <bool()> STOP_CONDITION_LEFT_45 = getLineSensorStopCondition(robot, { 1, 0, -1, -1 });
-	const function <bool()> STOP_CONDITION_RIGHT_TURN = getLineSensorStopCondition(robot, { -1, -1, 1, 1 });
-	const function <bool()> STOP_CONDITION_LEFT_TURN = getLineSensorStopCondition(robot, { 1, 1, -1, -1 });
+
+	//const function <bool()> STOP_CONDITION_RIGHT_45 = getLineSensorStopCondition(robot, { -1, -1, 0, 1 });
+	//const function <bool()> STOP_CONDITION_LEFT_45 = getLineSensorStopCondition(robot, { 1, 0, -1, -1 });
+	//const function <bool()> STOP_CONDITION_RIGHT_TURN = getLineSensorStopCondition(robot, { -1, -1, 1, 1 });
+	//const function <bool()> STOP_CONDITION_LEFT_TURN = getLineSensorStopCondition(robot, { 1, 1, -1, -1 });
 
 
-	Instruction testInstruction(robot, followLineOperation(robot), STOP_CONDITION_T_JUNCTION, 1000, 20000);
-	testInstruction.operation();
-	Instruction instructions [1] = {testInstruction};
-	
-	function <bool ()> = getLine
-	
+
+    delay(10000);
 	int val = robot.sendTestInstruction();  // send test instruction
 	if (val == TEST_INSTRUCTION_RESULT) {     // check result
+
+        int SENSOR_T_JUNCTION [4] =  {1, 1, 1, 1 };
+        cout << SENSOR_T_JUNCTION[0] << endl;
+        const function <bool()> STOP_CONDITION_T_JUNCTION = getLineSensorStopCondition(robot, SENSOR_T_JUNCTION);
+
+        Instruction testInstruction(robot, followLineOperation(robot), STOP_CONDITION_T_JUNCTION, 1000, 20000000);
+        Instruction testInstruction2(robot, followLineOperation(robot), STOP_CONDITION_T_JUNCTION, 1000, 20000000);
+        Instruction testInstruction3(robot, followLineOperation(robot), STOP_CONDITION_T_JUNCTION, 1000, 20000000);
+
+        testInstruction.operation();
+        Instruction instructions [3] = {testInstruction,testInstruction2, testInstruction3};
+
 		cout << "Test passed" << endl;
-		
+
 		InstructionHandler instructionHandler;
 		instructionHandler.runInstructions(instructions);
 
@@ -44,6 +52,7 @@ int main()
 	}
 	else if (val == REQUEST_ERROR) {
 		cout << "Fatal errors on link:" << endl;
+		robot.printErrors();
 	}
 	else
 		cout << "Test failed (bad value returned)" << endl;
@@ -55,23 +64,29 @@ void bullShit(){
 	cout<<"something belse" << endl;
 }
 
-function<bool ()> getLineSensorStopCondition(Robot robot, int sensorState[]) {
-	return []() {
+function<bool ()> getLineSensorStopCondition(Robot& robot, int sensorState[]) {
+	return [&, sensorState]() {
 		robot.updateLineSensors();
-		robot.checkLineSensorsMatch(sensorState);
+        return robot.checkLineSensorsMatch(sensorState);
 	};
 }
 
-function<void()> followLineOperation(Robot robot) {
-	return []() {
-		if (robot.checkLineSensorsMatch([-1, 0, 0, -1])) {
+function<void()> followLineOperation(Robot& robot) {
+	return [&]() {
+        int goingStraight [4] = {-1, 0, 0, -1};
+        int offLeft [4] = {-1, 1, 0, -1};
+        int offRight [4] = {-1, 0, 1, -1};
+		if (robot.checkLineSensorsMatch(goingStraight)) {
+            //cout << "GOING STRAIGHT" << endl;
 			robot.setMotors(1.0, 1.0);
 		}
-		else if (robot.checkLineSensorsMatch([-1, 1, 0, -1])) {
-			robot.setMotors(1.0, 0.8);
-		}
-		else if (robot.checkLineSensorsMatch([-1, 0, 1, -1])) {
+		else if (robot.checkLineSensorsMatch(offLeft)) {
+            //cout << "OFF LEFT" << endl;
 			robot.setMotors(0.8, 1.0);
 		}
-	}
+		else if (robot.checkLineSensorsMatch(offRight)) {
+            //cout << "OFF RIGHT" << endl;
+			robot.setMotors(1.0, 0.8);
+		}
+	};
 }

@@ -8,11 +8,11 @@ class Robot{
 		robot_link rlink;
 		int leftSpeed;
 		int rightSpeed;
-		bool lineSensors[4]; //left sensor first, rightmost last
+		int lineSensors[4]; //left sensor first, rightmost last
 	public:
 		Robot();
 		void initialiseRobotLink();
-		void initiliseSensors();
+		void initialiseSensors();
 		int sendTestInstruction();
 		void printErrors();
 		void setLeftMotor(double speed);
@@ -20,6 +20,6 @@ class Robot{
 		void setMotors(double leftSpeed, double rightSpeed);
 		void stopMotors();
 		void updateLineSensors();
-		bool Robot : checkLineSensorsMatch(int sensorState[]);
+		bool checkLineSensorsMatch(int sensorState[]);
 };
 #endif
