@@ -18,6 +18,7 @@ void Robot::initialiseSensors() {
 	for(int i = 0; i< 4; i++){
         lineSensors[i] = false;
 	}
+	watch.start();
 }
 
 void Robot::initialiseRobotLink(){
@@ -34,20 +35,28 @@ void Robot::initialiseRobotLink(){
 }
 
 void Robot::setLeftMotor(double speed){
-	int uIntSpeed = doubleToUInt(-1.0 * speed);
+	int uIntSpeed = doubleToUInt(-1.0 * limitSpeed(speed));
 	if (uIntSpeed != leftSpeed) {
+        leftSpeed = uIntSpeed;
 		rlink.command(MOTOR_1_GO, uIntSpeed);
 	}
 }
 
+double Robot::limitSpeed(double speed){
+    double limitedSpeed = max(speed, -1.0);
+    return min<double>(limitedSpeed, 1.0);
+}
+
 void Robot::setRightMotor(double speed){
-	int uIntSpeed = doubleToUInt(speed);
+	int uIntSpeed = doubleToUInt(limitSpeed(speed));
 	if (uIntSpeed != rightSpeed) {
+        rightSpeed = uIntSpeed;
 		rlink.command(MOTOR_2_GO, uIntSpeed);
 	}
 }
 
 void Robot::setMotors(double leftSpeed, double rightSpeed){
+    //cout << leftSpeed << ',' << rightSpeed << endl;
 	setLeftMotor(leftSpeed);
 	setRightMotor(rightSpeed);
 }
@@ -67,9 +76,11 @@ void Robot::printErrors(){
 
 void Robot::updateLineSensors() {
 	int sensorValues = rlink.request(READ_PORT_0);
-	cout<< sensorValues<< endl;
+	int currentTime = watch.read();
 	for (int i = 0; i < 4; i++) {
-		lineSensors[i] = sensorValues % 2;
+        int sensorValue = sensorValues %2;
+		lineSensors[i] = sensorValue;
+		lineSensorsLastTriggered[sensorValue][i] = currentTime;
 		sensorValues = sensorValues >> 1;
 	}
 }
@@ -77,6 +88,17 @@ void Robot::updateLineSensors() {
 bool Robot::checkLineSensorsMatch(int sensorState[]) {
 	for (int i = 0; i < 4; i++) {
 		if (sensorState[i] != -1 && sensorState[i] != lineSensors[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
+bool Robot::checkLineSensorsMatchFuzzy(int sensorState[], int interval) {
+    int currentTime = watch.read();
+	for (int i = 0; i < 4; i++) {
+		if (sensorState[i] != -1 && sensorState[i] != lineSensors[i] && currentTime-lineSensorsLastTriggered[sensorState[i]][i] > interval) {
 			return false;
 		}
 	}

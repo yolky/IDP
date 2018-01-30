@@ -8,7 +8,7 @@ class InstructionHandler{
 	public:
         Robot robot;
 		InstructionHandler();
-		void runInstructions(Instruction instructions[]);
+		void runInstructions(Instruction instructions[], int length);
 		void runInstruction(Instruction& instruction);
 };
 #endif
