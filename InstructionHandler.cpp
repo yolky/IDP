@@ -3,33 +3,49 @@
 #include "InstructionHandler.h"
 #include "Instruction.h"
 
-InstructionHandler::InstructionHandler(){
+InstructionHandler::InstructionHandler(Robot& _robot):
+robot(_robot){
 };
 
-void InstructionHandler::runInstructions(Instruction instructions[], int length){
-	for (int i = 0; i < length; i++) {
-        cout << "al;skdjf;alsdf" << endl;
-		runInstruction(instructions[i]);
-	}
-	cout << "done" << endl;
-}
-
 void InstructionHandler::runInstruction(Instruction& instruction) {
-	stopwatch watch;
-	watch.start();
-	int runningTime = watch.read();
-	while ((runningTime < instruction.maxTime && !instruction.stopCondition()) || runningTime < instruction.minTime) {
+    cout << "starting int" << endl;
+    instruction.startRunning();
+    int runningTime = instruction.getRunningTime();
+    if(instruction.hasPreInstruction){
+        instruction.preInstruction();
+    }
+cout << "starting operation" << endl;
+	while (((runningTime < instruction.maxTime && !instruction.evaluateStopConditions()) || runningTime < instruction.minTime) && !robot.getStartButtonPressedWithUpdate()) {
 		instruction.operation();
-		runningTime = watch.read();
-		delay(10);
+		runningTime = instruction.getRunningTime();
+		delay(2);
 	}
-	cout << instruction.minTime << endl;
+
+	int stopTime = runningTime;
+	while(runningTime < stopTime+instruction.extraTime){
+        runningTime = instruction.getRunningTime();
+        instruction.operation();
+        delay(2);
+	}
+    instruction.stopRunning();
 	if (runningTime > instruction.maxTime) {
-		//do reversing shit
+        //do reversing shit
 	}
-	else{
-        cout<< instruction.extraTime<< endl;
-        delay(instruction.extraTime);
+	if(instruction.hasPostInstruction){
+        instruction.postInstruction();
+    }
+
+
+    if(robot.getStartButtonPressed() || instruction.isEndState){
+        if(instruction.isEndState){
+            cout << "end of instructions reached" << endl;
+        }
+        else{
+            cout << "Stop button pressed" << endl;
+        }
+        robot.stopMotors();
 	}
-	watch.stop();
+	else {
+        runInstruction(instruction.getNextInstruction());
+	}
 }

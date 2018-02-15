@@ -5,10 +5,9 @@
 #define INSTRUCTION_HANDLER_H
 class InstructionHandler{
 	private:
+        Robot& robot;
 	public:
-        Robot robot;
-		InstructionHandler();
-		void runInstructions(Instruction instructions[], int length);
+		InstructionHandler(Robot& _robot);
 		void runInstruction(Instruction& instruction);
 };
 #endif
