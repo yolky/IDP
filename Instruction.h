@@ -7,14 +7,15 @@
 class Instruction{
 	private:
 		int selectedNextInstruction = 0;
+		int defaultNextInstructionIndex = 0;
 		vector<Instruction> nextInstructionsTest;
 		int numberStopConditions;
 		stopwatch watch;
 	public:
         Robot& robot;
-        		Instruction* nextInstructions[12];
-            		function<bool()>* stopConditions[12];
-
+        Instruction* nextInstructions[12];
+        function<bool()>* stopConditions[12];
+        bool hasDefaultInstruction = false;
 		//Instruction(Robot& robot, void(*_operation)(), bool(*_stopCondition)(), int _minTime, int _maxTime);
 		Instruction(Robot& _robot, function<void ()> _operation, int _minTime, int _maxTime, int _extraTime = 0);
         Instruction(Robot& _robot, function<void (int previousValues[], int& previousValuesLength, int& previousValueIndex)> _operation, int _minTime, int _maxTime, int _extraTime = 0);
@@ -40,5 +41,7 @@ class Instruction{
 		bool hasPostInstruction = false;
 		void setPreInstruction(function<void ()>& _preInstruction);
 		void setPostInstruction(function<void ()>& _postInstruction);
+		void setDefaultNextInstructionIndex(int selectedInstruction);
+		Instruction& getDefaultNextInstruction();
 };
 #endif

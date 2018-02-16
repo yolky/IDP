@@ -27,11 +27,10 @@ class Robot{
 	public:
 		Robot();
         static const int NUMBER_VALUES_STORED = 10;
-        static const int DIFFERENTIATION_INTERVAL_HARVESTING = 6;
+        int integralCount = 0;
         int getDistanceSensorVoltage();
         int previousDistanceIndex;
         int previousDistanceValues[NUMBER_VALUES_STORED];
-        int previousLDRValues[DIFFERENTIATION_INTERVAL_HARVESTING];
         int previousLDRIndex = 0;
 		void initialiseRobotLink();
 		void initialiseSensors();
@@ -46,7 +45,7 @@ class Robot{
 		bool checkLineSensorsMatch(int sensorState[]);
 		bool checkLineSensorsMatchFuzzy(int sensorState[], int interval);
 		void activateHarvestMechanism();
-		void deactivateHarvestMechanism();
+		void deactivateHarvestMechanism(bool force = false);
 		void updateDistanceSensor();
         bool getStartButtonPressed();
         bool getStartButtonPressedWithUpdate();
@@ -54,6 +53,7 @@ class Robot{
         void awaitStartButtonPress();
         void turnMechanism();
         void updateLDRFront(bool udpateMean = true);
+        void updateLDRBack(bool udpateMean = true);
         int getLDRFront();
         void clearMeanLDR();
         double meanLDR;
@@ -66,5 +66,6 @@ class Robot{
         void harvestBrassica();
         ofstream myfile;
         ofstream myfile2;
+        void resetIntegral();
 };
 #endif

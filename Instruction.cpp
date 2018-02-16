@@ -43,9 +43,7 @@ int Instruction::getRunningTime(){
 }
 
 bool Instruction::evaluateStopConditions(){
-    cout << 'here' << endl;
     for(int i =0; i<numberStopConditions; i++){
-        cout << "dead" << endl;
         if((*stopConditions[i])()){
             selectedNextInstruction = i;
             return true;
@@ -80,4 +78,13 @@ void Instruction::setNextInstructions(Instruction* instructions[], int numberIns
 
 Instruction& Instruction::getNextInstruction(){
     return *nextInstructions[selectedNextInstruction];
+}
+
+void Instruction::setDefaultNextInstructionIndex(int selectedInstruction){
+    hasDefaultInstruction = true;
+    defaultNextInstructionIndex = selectedInstruction;
+}
+
+Instruction& Instruction::getDefaultNextInstruction(){
+    return *nextInstructions[defaultNextInstructionIndex];
 }

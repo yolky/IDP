@@ -13,5 +13,6 @@ class StopwatchWithPause{
         void pause();
         void start();
         void stop();
+        void setTime(int time);
 };
 #endif

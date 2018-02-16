@@ -8,13 +8,11 @@ robot(_robot){
 };
 
 void InstructionHandler::runInstruction(Instruction& instruction) {
-    cout << "starting int" << endl;
     instruction.startRunning();
     int runningTime = instruction.getRunningTime();
     if(instruction.hasPreInstruction){
         instruction.preInstruction();
     }
-cout << "starting operation" << endl;
 	while (((runningTime < instruction.maxTime && !instruction.evaluateStopConditions()) || runningTime < instruction.minTime) && !robot.getStartButtonPressedWithUpdate()) {
 		instruction.operation();
 		runningTime = instruction.getRunningTime();
@@ -28,15 +26,15 @@ cout << "starting operation" << endl;
         delay(2);
 	}
     instruction.stopRunning();
-	if (runningTime > instruction.maxTime) {
-        //do reversing shit
-	}
+
 	if(instruction.hasPostInstruction){
         instruction.postInstruction();
     }
 
-
-    if(robot.getStartButtonPressed() || instruction.isEndState){
+    if (runningTime > instruction.maxTime && instruction.hasDefaultInstruction) {
+        runInstruction(instruction.getDefaultNextInstruction());
+	}
+    else if(robot.getStartButtonPressed() || instruction.isEndState){
         if(instruction.isEndState){
             cout << "end of instructions reached" << endl;
         }

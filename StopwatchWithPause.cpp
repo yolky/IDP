@@ -31,3 +31,7 @@ void StopwatchWithPause::stop(){
         running = false;
     }
 }
+
+void StopwatchWithPause::setTime(int time){
+    totalTime = time;
+}

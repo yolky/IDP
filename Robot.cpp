@@ -14,6 +14,7 @@ Robot::Robot(){
 	initialiseSensors();
 	myfile.open("test.txt");
     myfile2.open("test2.txt");
+    rlink.command (RAMP_TIME, 0);
 }
 
 void Robot::initialiseSensors() {
@@ -27,10 +28,6 @@ void Robot::initialiseSensors() {
 	}
 
 	for(int i =0; i< NUMBER_VALUES_STORED; i++){
-        previousDistanceValues[i] = -1;
-	}
-
-	for(int i =0; i< DIFFERENTIATION_INTERVAL_HARVESTING; i++){
         previousDistanceValues[i] = -1;
 	}
 
@@ -85,7 +82,6 @@ void Robot::setRightMotor(double speed){
 }
 
 void Robot::setMotors(double leftSpeed, double rightSpeed){
-    //cout << leftSpeed << ',' << rightSpeed << endl;
 	setLeftMotor(leftSpeed);
 	setRightMotor(rightSpeed);
 }
@@ -148,9 +144,9 @@ void Robot::activateHarvestMechanism(){
     }
 }
 
-void Robot::deactivateHarvestMechanism(){
+void Robot::deactivateHarvestMechanism(bool force){
     int newPinValue = setBitValue(pinValues[1], 0, 0);
-    if(newPinValue != pinValues[1]){
+    if(newPinValue != pinValues[1] || force){
         pinValues[1] = newPinValue;
         rlink.command(WRITE_PORT_1, pinValues[1]);
     }
@@ -167,8 +163,7 @@ void Robot::updateDistanceSensor(){
 }
 
 void Robot::updateLDRFront(bool updateMean){
-    LDRFront = rlink.request(ADC4);
-    //cout<< " mean " << meanLDR <<endl << "    sss    " << LDRFront << endl;;
+    LDRFront = rlink.request(ADC2);
     myfile << LDRFront << "\n";
     myfile2 << meanLDR << "\n";
     if(updateMean){
@@ -176,11 +171,15 @@ void Robot::updateLDRFront(bool updateMean){
         LDREntriesTotal += LDRFront;
         meanLDR = (double)LDREntriesTotal/(double)LDREntriesLength;
     }
-    previousLDRValues[previousLDRIndex] = LDRFront;
-    previousLDRIndex  = (previousLDRIndex + 1)%DIFFERENTIATION_INTERVAL_HARVESTING;
+}
+
+void Robot::updateLDRBack(bool updateMean){
+    int LDRBack = rlink.request(ADC2);
+    cout<< LDRBack << endl;
 }
 
 void Robot::clearMeanLDR(){
+    cout << "mean cleared" << endl;
     LDREntriesLength = 0;
     LDREntriesTotal = 0;
 }
@@ -229,14 +228,23 @@ void Robot::awaitStartButtonPress(){
 }
 
 void Robot::turnMechanism(){
+    rlink.command(RAMP_TIME, 128);
     stopMotors();
     setMechanismMotor(-1.0);
-    delay(8500);
+    delay(3200);
     setMechanismMotor(0.0);
-    delay(1000);
+    delay(500);
+    activateHarvestMechanism();
+    delay(500);
+    setMechanismMotor(-1.0);
+    delay(3600);
+    setMechanismMotor(0.0);
+    delay(300);
+    deactivateHarvestMechanism();
     setMechanismMotor(1.0);
-    delay(6720);
+    delay(5650);
     setMechanismMotor(0.0);
+    rlink.command(RAMP_TIME, 0);
 }
 
 void Robot::harvestBrassica(){
@@ -244,4 +252,8 @@ void Robot::harvestBrassica(){
     delay(800);
     deactivateHarvestMechanism();
     delay(800);
+}
+
+void Robot::resetIntegral(){
+    integralCount = 0;
 }
