@@ -23,7 +23,6 @@ void StopwatchWithPause::start(){
     }
 }
 
-
 void StopwatchWithPause::stop(){
     if(running){
         totalTime = 0;

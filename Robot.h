@@ -67,5 +67,6 @@ class Robot{
         ofstream myfile;
         ofstream myfile2;
         void resetIntegral();
+        void turnOnLED(int bit, bool value = true);
 };
 #endif

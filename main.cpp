@@ -1,5 +1,6 @@
-#include <iostream>
 using namespace std;
+
+#include <iostream>
 #include <robot_instr.h>
 #include <robot_link.h>
 #include <robot_delay.h>
@@ -13,9 +14,7 @@ using namespace std;
 #include "InstructionHandler.cpp"
 #include "StopwatchWithPause.h"
 #include "StopwatchWithPause.cpp"
-#include "HarvestInstructionFactory.h"
 #include "HarvestInstructionFactory.cpp"
-
 #include "globals.cpp"
 
 function<void()> makeTurn(Robot& robot, double leftMotorSpeed, double rightMotorSpeed);
@@ -32,6 +31,7 @@ void exitFirstDepositAreaToFlat();
 void exitDepositeArea(bool firstStartingArea);
 void nearHarvestAreaToDeposit(bool depositInFirstSection);
 void exitSecondDepositAreaToStart();
+void notLIkeThis();
 
 int main()
 {
@@ -46,7 +46,6 @@ int main()
             cout<< "Waiting for start button to be pressed" << endl;
             robot.awaitStartButtonPress();
             cout << "OPERATIONS STARTED" << endl;
-            //instructionHandler.runInstruction(horribleIdea);
             exitStartArea();
             flatForwardHarvest(false);
             turnAroundAndGetNearStart();
@@ -56,6 +55,8 @@ int main()
             turnAroundAndGetNearStart();
             nearHarvestAreaToDeposit(false);
             exitSecondDepositAreaToStart();
+            delay(6000);
+            notLIkeThis();
             robot.myfile.close();
             robot.myfile2.close();
         }
@@ -71,9 +72,82 @@ int main()
 
 }
 
+void notLIkeThis(){
+    Instruction startTurn(robot, makeTurn(robot, 1.0, -0.4), 1100, 10000);
+    Instruction driveUpToFlatHarvest(robot, followLineOperation(robot, 0.7), 1000, 10000, 0);
+    Instruction drivePastShit(robot, followLineOperation(robot, 0.7), 3000, 15000);
+    Instruction turnRight(robot, makeTurn(robot, 1.0, -0.25), 1100, 2400);
+    Instruction climbHill(robot, followLineOperation(robot, 0.7), 4000, 15000, 1650);
+    Instruction smoothTurn(robot, makeTurn(robot, -0.1, 0.7), 600, 1200, 150);
+    Instruction suicide(robot, followLineOperation(robot, -1.0, -0.2), 7000, 15000);
+    Instruction slightTurn(robot, makeTurn(robot, -0.1, 0.7), 400, 1200, 150);
+    Instruction reverseBackToline(robot, followLineOperation(robot, -0.7, -0.2), 500, 10000, 800);
+    Instruction realign(robot, makeTurn(robot, 0.5, -0.5), 400, 1200);
+    Instruction ontoSomeLing(robot, followLineOperation(robot, 0.4, 0.3), 400, 5000);
+
+    Instruction rightAgain(robot, makeTurn(robot, 1.0, -0.25), 400, 5000);
+    Instruction iWantToDie(robot, followLineOperation(robot, 0.4, 0.3), 400, 5000);
+    Instruction rightAgain2(robot, makeTurn(robot, 1.0, -0.25), 400, 5000);
+
+    Instruction homeStraight1(robot, followLineOperation(robot, 0.4, 0.3), 400, 5000);
+    Instruction homeStraight2(robot, followLineOperation(robot, 0.4, 0.3), 900, 1000);
+
+    startTurn.setStopCondition(STOP_CONDITION_RIGHT_TURN);
+    startTurn.setNextInstruction(driveUpToFlatHarvest);
+
+    driveUpToFlatHarvest.setStopCondition(STOP_CONDITION_T_JUNCTION);
+    driveUpToFlatHarvest.setPostInstruction(stopRobotPreInstruction);
+    driveUpToFlatHarvest.setNextInstruction(drivePastShit);
+
+    drivePastShit.setStopCondition(STOP_CONDITION_T_JUNCTION);
+    drivePastShit.setNextInstruction(turnRight);
+
+    turnRight.setStopCondition(STOP_CONDITION_RIGHT_TURN);
+    turnRight.setNextInstruction(climbHill);
+
+    climbHill.setStopCondition(STOP_CONDITION_FAR_RIGHT);
+    climbHill.setNextInstruction(smoothTurn);
+
+    smoothTurn.setStopCondition(STOP_CONDITION_LEFT_TURN);
+    smoothTurn.setNextInstruction(suicide);
+
+    suicide.setStopCondition(alwaysStopCondition);
+    suicide.setNextInstruction(slightTurn);
+
+    slightTurn.setStopCondition(alwaysStopCondition);
+    slightTurn.setNextInstruction(reverseBackToline);
+
+    reverseBackToline.setStopCondition(alwaysStopCondition);
+    reverseBackToline.setNextInstruction(realign);
+
+    realign.setStopCondition(STOP_CONDITION_RIGHT_TURN);
+    realign.setNextInstruction(ontoSomeLing);
+
+    ontoSomeLing.setStopCondition(STOP_CONDITION_T_JUNCTION);
+    ontoSomeLing.setNextInstruction(rightAgain);
+
+    rightAgain.setStopCondition(STOP_CONDITION_RIGHT_TURN);
+    rightAgain.setNextInstruction(iWantToDie);
+
+    iWantToDie.setStopCondition(STOP_CONDITION_RIGHT_TURN);
+    iWantToDie.setNextInstruction(rightAgain2);
+
+    rightAgain2.setStopCondition(STOP_CONDITION_RIGHT_TURN);
+    rightAgain2.setNextInstruction(homeStraight1);
+
+    homeStraight1.setStopCondition(STOP_CONDITION_T_JUNCTION);
+    homeStraight1.setNextInstruction(homeStraight2);
+
+    homeStraight2.setStopCondition(STOP_CONDITION_T_JUNCTION);
+
+
+
+    instructionHandler.runInstruction(startTurn);
+}
+
 void exitStartArea(){
     Instruction startTurn(robot, makeTurn(robot, -0.4, 1.0), 1100, 10000);
-    Instruction driveUpToFlatHarvest(robot, followLineOperation(robot, 0.7), 200, 10000, 0);
+    Instruction driveUpToFlatHarvest(robot, followLineOperation(robot, 0.7), 900, 10000, 0);
 
     startTurn.setStopCondition(STOP_CONDITION_LEFT_TURN);
     startTurn.setNextInstruction(driveUpToFlatHarvest);
@@ -92,10 +166,13 @@ void nearHarvestAreaToDeposit(bool depositInFirstSection){
     Instruction depositBrassicas1(robot, doNothingOperation(), 10, 10000);
 
 
-
     if(!depositInFirstSection){
         alignToFirstBox1.minTime = 21000;
     }
+
+    function<void()> turnOnDistanceSensorLED = [&robot](){
+        robot.turnOnLED(2);
+    };
 
     driveUp1.setStopCondition(STOP_CONDITION_T_JUNCTION);
     driveUp1.setNextInstruction(driveUp2);
@@ -104,6 +181,7 @@ void nearHarvestAreaToDeposit(bool depositInFirstSection){
     depositTurn.setStopCondition(alwaysStopCondition);
     depositTurn.setNextInstruction(alignToFirstBoxReverse);
 
+    alignToFirstBoxReverse.setPreInstruction(turnOnDistanceSensorLED);
     alignToFirstBoxReverse.setStopCondition(alwaysStopCondition);
     alignToFirstBoxReverse.setNextInstruction(alignToFirstBox1);
     alignToFirstBox1.setStopCondition(STOP_CONDITION_FRONT_TWO);
@@ -170,7 +248,7 @@ void exitDepositeArea(bool firstStartingArea){
     Instruction alignToFirstBox1(robot, followDistanceSensor(robot, 0.4, 90, 0.007, 0.1), 400, 15000);
     Instruction wide90(robot, makeTurn(robot, 0.1, 0.7), 1500, 10000);
     Instruction tight901(robot, makeTurn(robot, -0.3, 1.0), 1300, 10000);
-    Instruction shortReverse(robot, followLineOperation(robot, -0.7, -0.2), 80, 1000);
+    Instruction shortReverse(robot, followLineOperation(robot, -0.7, -0.2), 80, 800);
     Instruction tight902(robot, makeTurn(robot, -0.34, 1.0), 1300, 10000);
 
     alignToFirstBox1.setStopCondition(STOP_CONDITION_T_JUNCTION_VERY_FUZZY);
@@ -195,6 +273,7 @@ void exitDepositeArea(bool firstStartingArea){
         instructionHandler.runInstruction(alignToFirstBox1);
     }
     else{
+        shortReverse.maxTime = 1500;
         instructionHandler.runInstruction(wide90);
     }
 }

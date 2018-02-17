@@ -5,7 +5,6 @@
 #include "InstructionHandler.h"
 using namespace std;
 
-
 function<bool()> getLineSensorStopCondition(Robot& robot, int sensorState[]);
 function<bool()> getLineSensorStopConditionFuzzy(Robot& robot, int sensorState[], int interval);
 function<bool()> alwaysStop();
@@ -13,11 +12,9 @@ function<void()> followLineOperation(Robot& robot, double speed, double kP = 0.2
 function<void()> doNothingOperation(Robot& robot);
 function<bool()> aboveMeanStopCondition(Robot& robot, double threshold, bool doUpdateMean, bool greaterThan);
 
-
 Robot robot;
 
 InstructionHandler instructionHandler(robot);
-
 
 int SENSOR_T_JUNCTION [4] =  {1, -1, -1, 1 };
 int SENSOR_LEFT_TURN[4] = {-1,1,-1,-1};
@@ -25,7 +22,6 @@ int SENSOR_RIGHT_TURN[4] = {-1,-1,1,-1};
 int SENSOR_FAR_RIGHT[4] = {-1, -1, -1, 1};
 int SENSOR_FAR_LEFT[4] = {1, -1, -1, -1};
 int SENSOR_FRONT_TWO[4] = {-1, 1, 1, -1};
-
 
 function <bool()> STOP_CONDITION_T_JUNCTION = getLineSensorStopConditionFuzzy(robot, SENSOR_T_JUNCTION,130);
 function <bool()> STOP_CONDITION_T_JUNCTION_VERY_FUZZY = getLineSensorStopConditionFuzzy(robot, SENSOR_T_JUNCTION,400);
@@ -112,4 +108,4 @@ function<bool()> aboveMeanStopCondition(Robot& robot, double threshold, bool doU
     };
 }
 
-#endif // HARVESTINSTRUCTIONFACTORY_H_INCLUDED
+#endif

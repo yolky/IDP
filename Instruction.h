@@ -16,11 +16,8 @@ class Instruction{
         Instruction* nextInstructions[12];
         function<bool()>* stopConditions[12];
         bool hasDefaultInstruction = false;
-		//Instruction(Robot& robot, void(*_operation)(), bool(*_stopCondition)(), int _minTime, int _maxTime);
 		Instruction(Robot& _robot, function<void ()> _operation, int _minTime, int _maxTime, int _extraTime = 0);
         Instruction(Robot& _robot, function<void (int previousValues[], int& previousValuesLength, int& previousValueIndex)> _operation, int _minTime, int _maxTime, int _extraTime = 0);
-		//void (*operation)();
-		//bool (*stopCondition)();
 		function<void ()> operation;
 		function<void ()> preInstruction;
         function<void ()> postInstruction;

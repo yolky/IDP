@@ -15,6 +15,7 @@ Robot::Robot(){
 	myfile.open("test.txt");
     myfile2.open("test2.txt");
     rlink.command (RAMP_TIME, 0);
+    rlink.command(WRITE_PORT_1, 0);
 }
 
 void Robot::initialiseSensors() {
@@ -49,6 +50,17 @@ void Robot::initialiseRobotLink(){
 		rlink.print_errs("    ");
 	}
 
+}
+
+void Robot::turnOnLED(int bit, bool value){
+    int newPinValue = pinValues[1];
+    for(int i =1; i<5; i++){
+        newPinValue = setBitValue(newPinValue, i, true);
+    }
+    newPinValue = setBitValue(newPinValue, bit, !value);
+    if(newPinValue != pinValues[1]){
+        rlink.command(WRITE_PORT_1, newPinValue);
+    }
 }
 
 void Robot::setLeftMotor(double speed){
@@ -228,6 +240,7 @@ void Robot::awaitStartButtonPress(){
 }
 
 void Robot::turnMechanism(){
+    turnOnLED(1);
     rlink.command(RAMP_TIME, 128);
     stopMotors();
     setMechanismMotor(-1.0);
@@ -242,8 +255,9 @@ void Robot::turnMechanism(){
     delay(300);
     deactivateHarvestMechanism();
     setMechanismMotor(1.0);
-    delay(5650);
+    delay(5600);
     setMechanismMotor(0.0);
+    turnOnLED(1, false);
     rlink.command(RAMP_TIME, 0);
 }
 

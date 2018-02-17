@@ -10,7 +10,6 @@ Instruction::Instruction(Robot& _robot, function<void ()> _operation, int _minTi
 	extraTime = _extraTime;
 }
 
-
 Instruction::Instruction(Robot& _robot, function<void (int previousValues[], int &previousValuesLength, int& previousValueIndex)> _operation, int _minTime, int _maxTime, int _extraTime):
 	robot(_robot)
 {

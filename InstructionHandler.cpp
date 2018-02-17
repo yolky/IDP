@@ -42,6 +42,8 @@ void InstructionHandler::runInstruction(Instruction& instruction) {
             cout << "Stop button pressed" << endl;
         }
         robot.stopMotors();
+        robot.harvestTimer.stop();
+        robot.clearMeanLDR();
 	}
 	else {
         runInstruction(instruction.getNextInstruction());

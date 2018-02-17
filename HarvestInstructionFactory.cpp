@@ -5,9 +5,9 @@
 using namespace std;
 
 void flatForwardHarvest(bool harvestCauliflowers);
+void checkForHarvestTimesAndRunMechanism(Robot& robot);
 function<void()> overBrassicaOperation(Robot& robot, double speed, double kP);
 function<void()> preBrassicaOperation(Robot& robot, double speed, double kP);
-void checkForHarvestTimesAndRunMechanism(Robot& robot);
 
 function<void()> overBrassicaOperation(Robot& robot, double speed, double kP){
     return [&, speed, kP](){
@@ -54,7 +54,7 @@ void flatForwardHarvest(bool harvestCauliflowers){
         if(aboveMeanStopCondition(robot, -20, true, true)()){
             robot.meanLDR -= 7;
             robot.harvestTimer.start();
-            robot.harvestTimer.setTime(-400);
+            robot.harvestTimer.setTime(-320);
             return true;
         }
         return false;
@@ -69,7 +69,7 @@ void flatForwardHarvest(bool harvestCauliflowers){
     };
 
     function<bool()> tJuctionMinTime = [&robot, &STOP_CONDITION_T_JUNCTION](){
-        return((robot.harvestTimer.read() > 3000) && STOP_CONDITION_T_JUNCTION());
+        return((robot.harvestTimer.read() > 5000) && STOP_CONDITION_T_JUNCTION());
     };
 
     function<bool()>* preBrassicaStopConditions[] = {&preBrassicaStopCauliflower, &preBrassicaStopCabbage, &tJuctionMinTime};
@@ -94,9 +94,9 @@ void flatForwardHarvest(bool harvestCauliflowers){
 
         cout << "wid " << brassicaWidth << "  height  " << brassicaMax << endl;
 
-        if(brassicaWidth > 300){
+        if(brassicaWidth > 240){
             robot.clearMeanLDR();
-            if(brassicaMin < -12){
+            if(brassicaMin <= -5){
 
                 cout << "LARGE CAULIFLOWER" << endl;
                 if(harvestCauliflowers){
@@ -104,7 +104,7 @@ void flatForwardHarvest(bool harvestCauliflowers){
                 }
             }
 
-            if(brassicaMax > 40){
+            if(brassicaMax > 40 || robot.brassicaMaxValue > 104){
                 cout << "LARGE CABBAGE" << endl;
                 if(!harvestCauliflowers){
                     robot.brassicaHarvestTimes.push(robot.brassicaStartTime + 1500);
@@ -128,11 +128,16 @@ void flatForwardHarvest(bool harvestCauliflowers){
         swap( robot.brassicaHarvestTimes, empty);
     };
 
+    if(harvestCauliflowers){
+        robot.turnOnLED(3);
+    }
+    else{
+        robot.turnOnLED(4);
+    }
 
+    Instruction shortReverse(robot, followLineOperation(robot, -0.5, -0.2), 800, 3000);
 
-    Instruction shortReverse(robot, followLineOperation(robot, -0.5, -0.2), 400, 3000);
-
-    Instruction beginHarvest(robot, followLineOperation(robot, 0.3, 0.2), 220, 3000);
+    Instruction beginHarvest(robot, followLineOperation(robot, 0.3, 0.2), 500, 3000);
     Instruction preBrassica(robot, preBrassicaOperation(robot, 0.3, 0.2), 3, 10000);
     Instruction overCauliflower(robot, overBrassicaOperation(robot, 0.3, 0.2),30, 1000);
     Instruction overCabbage(robot, overBrassicaOperation(robot, 0.3, 0.2),200, 1000);
@@ -168,6 +173,6 @@ void flatForwardHarvest(bool harvestCauliflowers){
     endInstruction.setStopCondition(alwaysStopCondition);
     endInstruction.setPreInstruction(endInstructionPreInstruction);
 
-    instructionHandler.runInstruction(beginHarvest);
+    instructionHandler.runInstruction(shortReverse);
 }
 
